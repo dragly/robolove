@@ -72,6 +72,9 @@ class MainApp(ShowBase):
         self.accept("escape", sys.exit, [0])
         self.accept('d', self.toggleDebugMode)
 
+        # add tasks
+        self.taskMgr.add(self.checkLogic, "CheckLogic")
+
     def toggleGlow(self):
         self.glowSize = self.glowSize + 1
         if (self.glowSize == 4): self.glowSize = 0
@@ -94,6 +97,13 @@ class MainApp(ShowBase):
         else:
             self.disableMouse()
             self.ignore('c')
+
+    def checkLogic(self, task):
+        # this method is a placeholder to test if differnt stuff has occured
+        # like checking if two things are in certain positions, etc.
+        # most of this could probably by placed in collision detection,
+        # but this function is here in case we need it
+        return Task.cont
 
 app = MainApp()
 app.run()
