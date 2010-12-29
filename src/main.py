@@ -1,5 +1,4 @@
 from math import pi, sin, cos
-
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.task import Task
@@ -16,6 +15,8 @@ import sys
 loadPrcFile('robolove.prc')
 
 class MainApp(ShowBase):
+    
+
     def __init__(self):
         ShowBase.__init__(self)
 
@@ -55,7 +56,7 @@ class MainApp(ShowBase):
         # walk back and forth.
         pandaPosInterval1 = self.pandaActor.posInterval(13,
                                                         Point3(0, -10, 0),
-                                                        startPos=Point3(0, 10, 0))
+                                                        startPos=Point3(0, 0, 0))
         pandaPosInterval2 = self.pandaActor.posInterval(13,
                                                         Point3(0, 10, 0),
                                                         startPos=Point3(0, -10, 0))
@@ -84,20 +85,71 @@ class MainApp(ShowBase):
         # event handling
         self.accept("space", self.toggleGlow)
         self.accept("escape", sys.exit, [0])
-        self.accept('d', self.toggleDebugMode)
+        self.accept('o', self.toggleDebugMode)
+        
+        self.accept('p', self.pauseSequence)
         self.accept('w', self.moveForward)
+        self.accept('a', self.moveLeft)
+        self.accept('d', self.moveRight)
+        self.accept('s', self.moveBack)
 
         # add tasks
         self.taskMgr.add(self.checkLogic, "CheckLogic")
+
+    def moveForward(self):
+        currentPosition = self.pandaActor.getPos()
+        newPosition = Point3(0,2,0) + currentPosition
+        pandaMoveForwardInterval = self.pandaActor.posInterval(0.1,
+                                                        Point3(newPosition),
+                                                        startPos=Point3(currentPosition))
+        self.pandaPace = Sequence(pandaMoveForwardInterval)
+        self.pandaPace.start()
+        print newPosition
+        print currentPosition
+        return currentPosition
+    def moveBack(self):
+        currentPosition = self.pandaActor.getPos()
+        newPosition = Point3(0,-2,0) + currentPosition
+        pandaMoveForwardInterval = self.pandaActor.posInterval(0.1,
+                                                        Point3(newPosition),
+                                                        startPos=Point3(currentPosition))
+        self.pandaPace = Sequence(pandaMoveForwardInterval)
+        self.pandaPace.start()
+        print newPosition
+        print currentPosition
+        return currentPosition
+
+    def moveLeft(self):
+        currentPosition = self.pandaActor.getPos()
+        newPosition = Point3(-2,0,0) + currentPosition
+        pandaMoveForwardInterval = self.pandaActor.posInterval(0.1,
+                                                        Point3(newPosition),
+                                                        startPos=Point3(currentPosition))
+        self.pandaPace = Sequence(pandaMoveForwardInterval)
+        self.pandaPace.start()
+        print newPosition
+        print currentPosition
+        return currentPosition
+
+    def moveRight(self):
+        currentPosition = self.pandaActor.getPos()
+        newPosition = Point3(2,0,0) + currentPosition
+        pandaMoveForwardInterval = self.pandaActor.posInterval(0.1,
+                                                        Point3(newPosition),
+                                                        startPos=Point3(currentPosition))
+        self.pandaPace = Sequence(pandaMoveForwardInterval)
+        self.pandaPace.start()
+        print newPosition
+        print currentPosition
+        return currentPosition
+
+    def pauseSequence(self):
+        self.pandaPace.pause()
 
     def checkLogic(self, task):
         # this method is a placeholder to test if differnt stuff has occured
         # like checking wether the robot is ready for a new command, etc.
         return Task.cont
-
-    def moveForward(self):
-        self.pandaPace.pause()
-        print self.pandaActor.getPos()
 
     def toggleGlow(self):
         self.glowSize = self.glowSize + 1
