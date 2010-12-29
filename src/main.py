@@ -20,7 +20,7 @@ class MainApp(ShowBase):
         ShowBase.__init__(self)
 
         # Load shaders. If this fails, quit.
-        if(not loadShaders()):
+        if(not self.loadShaders()):
             return
 
         # Load the environment model.
@@ -136,6 +136,10 @@ class MainApp(ShowBase):
             addTitle("Toon Shader: Video card not powerful enough to do image postprocessing")
             return False
         self.glowSize=1
+
+        # Shadow shaders
+        # TODO: Implement shadows
+        
         return True
 
 app = MainApp()
