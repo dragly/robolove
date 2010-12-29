@@ -1,15 +1,12 @@
 from math import pi, sin, cos
 from panda3d.core import *
+from pandac.PandaModules import ActorNode, ForceNode, LinearVectorForce
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.task import Task
 from direct.actor.Actor import Actor
 from panda3d.core import Shader
 from direct.filter.CommonFilters import CommonFilters
-from panda3d.core import AmbientLight,DirectionalLight
-from panda3d.core import AntialiasAttrib
-from panda3d.core import TextNode,Point3,Vec4
-from panda3d.core import loadPrcFile
 from direct.interval.IntervalGlobal import Sequence
 import sys
 
@@ -56,33 +53,37 @@ class MainApp(ShowBase):
         self.pandaActor = Actor("models/tron")
         self.pandaActor.setScale(0.3, 0.3, 0.3)
         self.pandaActor.reparentTo(self.render)
+        self.pandaActor.setPos(10, 0, 4.2)
 
-        # Create the four lerp intervals needed for the panda to
-        # walk back and forth.
-        pandaPosInterval1 = self.pandaActor.posInterval(13,
-                                                        Point3(0, -10, 0),
-                                                        startPos=Point3(0, 0, 0))
-        pandaPosInterval2 = self.pandaActor.posInterval(13,
-                                                        Point3(0, 10, 0),
-                                                        startPos=Point3(0, -10, 0))
-        pandaHprInterval1 = self.pandaActor.hprInterval(3,
-                                                        Point3(180, 0, 0),
-                                                        startHpr=Point3(0, 0, 0))
-        pandaHprInterval2 = self.pandaActor.hprInterval(3,
-                                                        Point3(0, 0, 0),
-                                                        startHpr=Point3(180, 0, 0))
+        # set up physics
+        base.enableParticles()
+        # TODO: remove this
+        Node=NodePath(PandaNode("PhysicsNode"))
+        Node.reparentTo(render)
+        jetpackGuy=loader.loadModel("models/tron")
+        jetpackGuy.reparentTo(render)
+        an=ActorNode("jetpack-guy-physics")
+        anp=Node.attachNewNode(an)
+        base.physicsMgr.attachPhysicalNode(an)
+        jetpackGuy.reparentTo(anp)
+        an.getPhysicsObject().setMass(136.077)
+        jetpackGuy.setPos(0,0,0)
+        # add forces
+        gravityFN=ForceNode('world-forces')
+        gravityFNP=render.attachNewNode(gravityFN)
+        gravityForce=LinearVectorForce(0,0,1.81) #gravity acceleration
+        gravityFN.addForce(gravityForce)
 
-        # Create and play the sequence that coordinates the intervals.
-        self.pandaPace = Sequence(pandaPosInterval1,
-                                  pandaHprInterval1,
-                                  pandaPosInterval2,
-                                  pandaHprInterval2,
-                                  name="pandaPace")
-        self.pandaPace.loop()
+        an.getPhysical(0).addLinearForce(gravityForce)
 
         # set up camera and mouse settings
         self.camera.setPos(6.27662, -48.9656, 26.0119)
         self.camera.setHpr(7.30458, -27.7855, 3.34447)
+        self.cameraInterval = self.camera.posInterval(10,
+                                                        Point3(10,10,20),
+                                                        startPos=Point3(camera.getPos()))
+        self.cameraPace = Sequence(self.cameraInterval)
+        #self.cameraPace.start()
 
         # disable debug mode for starters
         self.setDebugMode(False)
@@ -99,7 +100,7 @@ class MainApp(ShowBase):
         self.accept('s', self.moveBack)
 
         # add tasks
-        self.taskMgr.add(self.checkLogic, "CheckLogic")
+        self.taskMgr.add(self.doLogic, "doLogic")
 
     def moveForward(self):
         currentPosition = self.pandaActor.getPos()
@@ -151,9 +152,11 @@ class MainApp(ShowBase):
     def pauseSequence(self):
         self.pandaPace.pause()
 
-    def checkLogic(self, task):
+    def doLogic(self, task):
         # this method is a placeholder to test if differnt stuff has occured
         # like checking wether the robot is ready for a new command, etc.
+
+
         return Task.cont
 
     def toggleGlow(self):
