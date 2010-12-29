@@ -20,7 +20,7 @@ class MainApp(ShowBase):
         ShowBase.__init__(self)
 
         # Load shaders. If this fails, quit.
-        if(not loadShaders()):
+        if(not self.loadShaders()):
             return
 
         # Load the environment model.
@@ -53,6 +53,13 @@ class MainApp(ShowBase):
 
         # Create the four lerp intervals needed for the panda to
         # walk back and forth.
+
+
+
+
+
+
+
         pandaPosInterval1 = self.pandaActor.posInterval(13,
                                                         Point3(0, -10, 0),
                                                         startPos=Point3(0, 10, 0))
@@ -86,18 +93,30 @@ class MainApp(ShowBase):
         self.accept("escape", sys.exit, [0])
         self.accept('d', self.toggleDebugMode)
         self.accept('w', self.moveForward)
+        self.accept('p', self.pauseSequence)
 
         # add tasks
         self.taskMgr.add(self.checkLogic, "CheckLogic")
+
+    def moveForward(self):
+        currentPosition = self.pandaActor.getPos()
+        newPosition = Point3(0,2,0) + currentPosition
+        pandaMoveForwardInterval = self.pandaActor.posInterval(1,
+                                                        Point3(newPosition),
+                                                        startPos=Point3(currentPosition))
+        self.pandaPace = Sequence(pandaMoveForwardInterval)
+        self.pandaPace.start()
+        print newPosition
+        print currentPosition
+        return currentPosition
+
+    def pauseSequence(self):
+        self.pandaPace.pause()
 
     def checkLogic(self, task):
         # this method is a placeholder to test if differnt stuff has occured
         # like checking wether the robot is ready for a new command, etc.
         return Task.cont
-
-    def moveForward(self):
-        self.pandaPace.pause()
-        print self.pandaActor.getPos()
 
     def toggleGlow(self):
         self.glowSize = self.glowSize + 1
