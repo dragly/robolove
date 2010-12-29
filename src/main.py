@@ -1,4 +1,5 @@
 from math import pi, sin, cos
+from panda3d.core import *
 from direct.showbase.ShowBase import ShowBase
 from direct.task import Task
 from direct.task import Task
@@ -24,13 +25,17 @@ class MainApp(ShowBase):
         if(not self.loadShaders()):
             return
 
-        # Load the environment model.
-        self.environ = self.loader.loadModel("models/environment")
-        # Reparent the model to render.
-        self.environ.reparentTo(self.render)
-        # Apply scale and position transforms on the model.
-        self.environ.setScale(0.25, 0.25, 0.25)
-        self.environ.setPos(-8, 42, 0)
+        floorTex=loader.loadTexture('maps/envir-ground.jpg')
+        cm=CardMaker('')
+        cm.setFrame(-2,2,-2,2)
+        floor = render.attachNewNode(PandaNode("floor"))
+        for y in range(12):
+            for x in range(12):
+                nn = floor.attachNewNode(cm.generate())
+                nn.setP(-90)
+                nn.setPos((x-6)*4, (y-6)*4, 0)
+        floor.setTexture(floorTex)
+        floor.flattenStrong()
 
         # set up shaders and anti alias
         self.render.setShaderAuto()
