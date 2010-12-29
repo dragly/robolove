@@ -56,6 +56,11 @@ class MainApp(ShowBase):
         self.pandaActor = Actor("models/tron")
         self.pandaActor.setScale(0.3, 0.3, 0.3)
         self.pandaActor.reparentTo(self.render)
+        # Text
+        self.text = TextNode('node name')
+        self.textNodePath = aspect2d.attachNewNode(self.text)
+        self.textNodePath.setScale(0.07)
+
 
         # Create the four lerp intervals needed for the panda to
         # walk back and forth.
@@ -100,6 +105,13 @@ class MainApp(ShowBase):
 
         # add tasks
         self.taskMgr.add(self.checkLogic, "CheckLogic")
+        self.taskMgr.add(self.refreshGUI, "RefreshGUI")
+
+    def refreshGUI(self, task):
+        string = str(self.pandaActor.getPos())
+        self.text.setText(string)
+        return task.cont
+
 
     def moveForward(self):
         currentPosition = self.pandaActor.getPos()
@@ -109,8 +121,6 @@ class MainApp(ShowBase):
                                                         startPos=Point3(currentPosition))
         self.pandaPace = Sequence(pandaMoveForwardInterval)
         self.pandaPace.start()
-        print newPosition
-        print currentPosition
         return currentPosition
     def moveBack(self):
         currentPosition = self.pandaActor.getPos()
@@ -120,8 +130,6 @@ class MainApp(ShowBase):
                                                         startPos=Point3(currentPosition))
         self.pandaPace = Sequence(pandaMoveForwardInterval)
         self.pandaPace.start()
-        print newPosition
-        print currentPosition
         return currentPosition
 
     def moveLeft(self):
@@ -132,8 +140,6 @@ class MainApp(ShowBase):
                                                         startPos=Point3(currentPosition))
         self.pandaPace = Sequence(pandaMoveForwardInterval)
         self.pandaPace.start()
-        print newPosition
-        print currentPosition
         return currentPosition
 
     def moveRight(self):
@@ -144,8 +150,6 @@ class MainApp(ShowBase):
                                                         startPos=Point3(currentPosition))
         self.pandaPace = Sequence(pandaMoveForwardInterval)
         self.pandaPace.start()
-        print newPosition
-        print currentPosition
         return currentPosition
 
     def pauseSequence(self):
