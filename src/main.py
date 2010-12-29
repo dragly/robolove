@@ -86,31 +86,17 @@ class MainApp(ShowBase):
         self.textNodePath = aspect2d.attachNewNode(self.text)
         self.textNodePath.setScale(0.05)
         self.text.setTextColor(1, 1, 1, 1)
-       
-  
-        
+      
+        # enable physics
+        base.enableParticles()
+        self.physicsNode=NodePath(PandaNode("PhysicsNode"))
+        self.physicsNode.reparentTo(render)
 
-#         set up physics
-#         base.enableParticles()
-        # TODO: remove this
-#        Node=NodePath(PandaNode("PhysicsNode"))
-#        Node.reparentTo(render)
-#        jetpackGuy=loader.loadModel("models/tron")
-#        jetpackGuy.reparentTo(render)
-#        an=ActorNode("jetpack-guy-physics")
-#        anp=Node.attachNewNode(an)
-#        base.physicsMgr.attachPhysicalNode(an)
-#        jetpackGuy.reparentTo(anp)
-#        an.getPhysicsObject().setMass(136.077)
-#        jetpackGuy.setPos(0,0,0)
-#        # add forces
-#        gravityFN=ForceNode('world-forces')
-#        gravityFNP=render.attachNewNode(gravityFN)
-#        gravityForce=LinearVectorForce(0,0,1.81) #gravity acceleration
-#        gravityFN.addForce(gravityForce)
-#
-#        an.getPhysical(0).addLinearForce(gravityForce)
-
+        # set up camera with physics
+        self.cameraActorNode=ActorNode("camera-physics")
+        self.cameraActorNodeParent=self.physicsNode.attachNewNode(self.cameraActorNode)
+        base.physicsMgr.attachPhysicalNode(self.cameraActorNode)
+        self.camera.reparentTo(self.cameraActorNodeParent)
 
         # set up camera and mouse settings
         self.camera.setPos(6.27662, -48.9656, 26.0119)
@@ -119,6 +105,7 @@ class MainApp(ShowBase):
                                                         Point3(10,10,20),
                                                         startPos=Point3(camera.getPos()))
         self.cameraPace = Sequence(self.cameraInterval)
+        self.cameraForwardThrottleEnabled = False
         #self.cameraPace.start()
 
         # disable debug mode for starters
@@ -135,9 +122,18 @@ class MainApp(ShowBase):
         self.accept('d', self.moveRight)
         self.accept('s', self.moveBack)
 
+        self.accept('arrow_up', self.enableCameraForwardThrottle)
+        self.accept('arrow_up-up', self.disableCameraForwardThrottle)
+
         # add tasks
         self.taskMgr.add(self.doLogic, "DoLogic")
 #        self.taskMgr.add(self.refreshGUI, "RefreshGUI")
+
+    def enableCameraForwardThrottle(self):
+        self.cameraForwardThrottleEnabled = True
+
+    def disableCameraForwardThrottle(self):
+        self.cameraForwardThrottleEnabled = False
 
     def refreshGUI(self, task):
         string = str(self.pandaActor.getPos())
@@ -189,8 +185,16 @@ class MainApp(ShowBase):
         self.pandaPace.pause()
 
     def doLogic(self, task):
+        dt = globalClock.getDt()
         # this method is a placeholder to test if differnt stuff has occured
         # like checking wether the robot is ready for a new command, etc.
+        if self.cameraForwardThrottleEnabled:
+            currentVelocity = self.cameraActorNode.getPhysicsObject().getVelocity()
+            newVelocity = currentVelocity + Vec3(dt*250,0,0)
+            self.cameraActorNode.getPhysicsObject().setVelocity(newVelocity)
+
+        # slow down camera ("friction")
+        self.cameraActorNode.getPhysicsObject().setVelocity(self.cameraActorNode.getPhysicsObject().getVelocity() * 0.92)
 
 
         return Task.cont
