@@ -100,13 +100,12 @@ class MainApp(ShowBase):
         self.accept('s', self.moveBack)
 
         # add tasks
-        self.taskMgr.add(self.doLogic, "doLogic")
-        self.taskMgr.add(self.checkLogic, "CheckLogic")
+        self.taskMgr.add(self.doLogic, "DoLogic")
         self.taskMgr.add(self.refreshGUI, "RefreshGUI")
 
     def refreshGUI(self, task):
         string = str(self.pandaActor.getPos())
-        self.text.setText(string)
+        #self.text.setText(string)
         return task.cont
 
     def moveForward(self):
