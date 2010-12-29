@@ -56,34 +56,12 @@ class MainApp(ShowBase):
         self.pandaActor = Actor("models/tron")
         self.pandaActor.setScale(0.3, 0.3, 0.3)
         self.pandaActor.reparentTo(self.render)
+        self.pandaActor.setPos(10,0,4.2)
+
         # Text
         self.text = TextNode('node name')
         self.textNodePath = aspect2d.attachNewNode(self.text)
-        self.textNodePath.setScale(0.07)
-
-
-        # Create the four lerp intervals needed for the panda to
-        # walk back and forth.
-        pandaPosInterval1 = self.pandaActor.posInterval(13,
-                                                        Point3(0, -10, 0),
-                                                        startPos=Point3(0, 0, 0))
-        pandaPosInterval2 = self.pandaActor.posInterval(13,
-                                                        Point3(0, 10, 0),
-                                                        startPos=Point3(0, -10, 0))
-        pandaHprInterval1 = self.pandaActor.hprInterval(3,
-                                                        Point3(180, 0, 0),
-                                                        startHpr=Point3(0, 0, 0))
-        pandaHprInterval2 = self.pandaActor.hprInterval(3,
-                                                        Point3(0, 0, 0),
-                                                        startHpr=Point3(180, 0, 0))
-
-        # Create and play the sequence that coordinates the intervals.
-        self.pandaPace = Sequence(pandaPosInterval1,
-                                  pandaHprInterval1,
-                                  pandaPosInterval2,
-                                  pandaHprInterval2,
-                                  name="pandaPace")
-        self.pandaPace.loop()
+        self.textNodePath.setScale(0.05)
 
         # set up camera and mouse settings
         self.camera.setPos(6.27662, -48.9656, 26.0119)
