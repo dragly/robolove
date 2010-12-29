@@ -21,7 +21,7 @@ class MainApp(ShowBase):
         # Load shaders. If this fails, quit.
         if(not self.loadShaders()):
             return
-
+        #Make some floors for us :)
         floorTex=loader.loadTexture('maps/envir-ground.jpg')
         cm=CardMaker('')
         cm.setFrame(-2,2,-2,2)
@@ -49,38 +49,67 @@ class MainApp(ShowBase):
         render.setLight(dlnp)
         render.setLight(alnp)
         
-        # set up model
+        # Models
+        #Tron
         self.pandaActor = Actor("models/tron")
         self.pandaActor.setScale(0.3, 0.3, 0.3)
         self.pandaActor.reparentTo(self.render)
+        self.pandaActor.setPos(10, 0, 4.2)
+
+        #Panda
+        # Load the "panda" model.  Loading a model returns a
+        # NodePath object.
+        ##self.panda = loader.loadModel("panda")
+        # Remember, loaded objects start out hidden!  If we want to
+        # see the panda, it must be reparented to the "render" node.
+        ##self.panda.reparentTo(render)
+        # By default, position is specified relative to a node's
+        # parent.Position is specified as "x,y,z" or "right, forward, up"
+        # Since panda's parent is the root node (render),
+        # this command moves panda to the global position (0, 30, -5).
+        ##self.panda.setPos(0, 0, 0)
+        # Alternately, the position can be given relative to any other
+        # NodePath.  Here, we set the position to be 30 feet in front
+        # of the camera, and slightly to the right.  Note the use of
+        # 'camera', another pre-defined NodePath object.
+        ##self.panda.setX(camera, 10)
+
+
+
+
+
+
+
 
         # Text
         self.text = TextNode('node name')
         self.textNodePath = aspect2d.attachNewNode(self.text)
         self.textNodePath.setScale(0.05)
+        self.text.setTextColor(1, 1, 1, 1)
+       
+  
+        
 
-        self.pandaActor.setPos(10, 0, 4.2)
-
-        # set up physics
-        base.enableParticles()
+#         set up physics
+#         base.enableParticles()
         # TODO: remove this
-        Node=NodePath(PandaNode("PhysicsNode"))
-        Node.reparentTo(render)
-        jetpackGuy=loader.loadModel("models/tron")
-        jetpackGuy.reparentTo(render)
-        an=ActorNode("jetpack-guy-physics")
-        anp=Node.attachNewNode(an)
-        base.physicsMgr.attachPhysicalNode(an)
-        jetpackGuy.reparentTo(anp)
-        an.getPhysicsObject().setMass(136.077)
-        jetpackGuy.setPos(0,0,0)
-        # add forces
-        gravityFN=ForceNode('world-forces')
-        gravityFNP=render.attachNewNode(gravityFN)
-        gravityForce=LinearVectorForce(0,0,1.81) #gravity acceleration
-        gravityFN.addForce(gravityForce)
-
-        an.getPhysical(0).addLinearForce(gravityForce)
+#        Node=NodePath(PandaNode("PhysicsNode"))
+#        Node.reparentTo(render)
+#        jetpackGuy=loader.loadModel("models/tron")
+#        jetpackGuy.reparentTo(render)
+#        an=ActorNode("jetpack-guy-physics")
+#        anp=Node.attachNewNode(an)
+#        base.physicsMgr.attachPhysicalNode(an)
+#        jetpackGuy.reparentTo(anp)
+#        an.getPhysicsObject().setMass(136.077)
+#        jetpackGuy.setPos(0,0,0)
+#        # add forces
+#        gravityFN=ForceNode('world-forces')
+#        gravityFNP=render.attachNewNode(gravityFN)
+#        gravityForce=LinearVectorForce(0,0,1.81) #gravity acceleration
+#        gravityFN.addForce(gravityForce)
+#
+#        an.getPhysical(0).addLinearForce(gravityForce)
 
 
         # set up camera and mouse settings
@@ -108,11 +137,13 @@ class MainApp(ShowBase):
 
         # add tasks
         self.taskMgr.add(self.doLogic, "DoLogic")
-        self.taskMgr.add(self.refreshGUI, "RefreshGUI")
+#        self.taskMgr.add(self.refreshGUI, "RefreshGUI")
 
     def refreshGUI(self, task):
         string = str(self.pandaActor.getPos())
-        #self.text.setText(string)
+        self.text.setText(string)
+        self.text.setCardColor(0, 0, 0, 0.5)
+        self.text.setCardAsMargin(0, 0, 0, 0)
         return task.cont
 
     def moveForward(self):
